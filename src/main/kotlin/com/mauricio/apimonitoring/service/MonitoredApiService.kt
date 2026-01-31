@@ -30,8 +30,7 @@ class MonitoredApiService(
             expectedStatus = request.expectedStatus,
             timeoutMs = request.timeoutMs,
             intervalMinutes = request.intervalMinutes,
-            createdAt = LocalDateTime.now(),
-            createdBy = user.id.toString()
+            createdAt = LocalDateTime.now()
         )
 
         val saved = apiRepository.save(api)
@@ -66,17 +65,27 @@ class MonitoredApiService(
         return toResponse(updated)
     }
 
-    fun delete(id: UUID) =
-        apiRepository.deleteById(id)
+    fun delete(id: UUID){
+        val api = apiRepository.findById(id)
+            .orElseThrow { NotFoundException("Monitored API not found") }
 
-    private fun toResponse(entity: MonitoredApiEntity) =
-        MonitoredApiResponse(
+        apiRepository.delete(api)
+    }
+
+    private fun toResponse(entity: MonitoredApiEntity): MonitoredApiResponse {
+
+        val userId = entity.user.id ?: throw NotFoundException("User id is null")
+        val user = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("User not found") }
+
+        return MonitoredApiResponse(
             id = entity.id!!,
             name = entity.name,
             url = entity.url,
             method = entity.method,
             headers = entity.headers,
             active = entity.active,
-            createdBy = userRepository.getById(UUID.fromString(entity.createdBy)).alias
+            createdBy = user.alias
         )
+    }
 }

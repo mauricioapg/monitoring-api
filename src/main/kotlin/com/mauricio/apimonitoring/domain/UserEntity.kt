@@ -12,7 +12,7 @@ class UserEntity(
     @GeneratedValue
     var id: UUID? = null,
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     var alias: String,
 
     @Column(nullable = false, unique = true)

@@ -13,7 +13,7 @@ class MonitoredApiController(
     private val service: MonitoredApiService
 ) {
 
-    @PostMapping("/{userId}")
+    @PostMapping("/user/{userId}")
     fun create(
         @PathVariable userId: UUID,
         @RequestBody @Valid request: MonitoredApiRequest

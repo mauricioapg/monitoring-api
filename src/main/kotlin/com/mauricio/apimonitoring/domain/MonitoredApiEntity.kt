@@ -1,8 +1,6 @@
 package com.mauricio.apimonitoring.domain
 
 import jakarta.persistence.*
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -47,8 +45,5 @@ class MonitoredApiEntity(
     var active: Boolean = true,
 
     @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-
-    @Column(name = "created_by", nullable = false)
-    var createdBy: String
+    var createdAt: LocalDateTime = LocalDateTime.now()
 )

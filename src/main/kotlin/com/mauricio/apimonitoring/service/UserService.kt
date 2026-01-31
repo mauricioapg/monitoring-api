@@ -14,16 +14,22 @@ class UserService(
     private val userRepository: UserRepository
 ) {
 
+
     fun create(request: UserRequest): UserResponse {
 
-        val api = UserEntity(
+        val userFound = userRepository.findByEmail(request.email)
+        if (userFound != null) {
+            throw IllegalArgumentException("Email already in use")
+        }
+
+        val user = UserEntity(
             alias = request.alias,
             email = request.email,
             password = request.password,
             createdAt = LocalDateTime.now()
         )
 
-        val saved = userRepository.save(api)
+        val saved = userRepository.save(user)
 
         return toResponse(saved)
     }
@@ -50,8 +56,12 @@ class UserService(
         return toResponse(updated)
     }
 
-    fun delete(id: UUID) =
-        userRepository.deleteById(id)
+    fun delete(id: UUID){
+        val user = userRepository.findById(id)
+            .orElseThrow { NotFoundException("User not found") }
+
+        userRepository.delete(user)
+    }
 
     private fun toResponse(entity: UserEntity) =
         UserResponse(

@@ -4,7 +4,7 @@ import com.mauricio.apimonitoring.domain.HeaderEmbeddable
 import java.util.UUID
 
 class MonitoredApiResponse(
-    val id: UUID,
+    val id: UUID? = null,
     val name: String,
     val url: String,
     val method: String,
