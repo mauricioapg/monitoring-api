@@ -3,6 +3,8 @@ package com.mauricio.apimonitoring.service
 import com.mauricio.apimonitoring.domain.UserEntity
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
+import com.mauricio.apimonitoring.exception.BusinessException
+import com.mauricio.apimonitoring.exception.ConflictException
 import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -19,7 +21,7 @@ class UserService(
 
         val userFound = userRepository.findByEmail(request.email)
         if (userFound != null) {
-            throw IllegalArgumentException("Email already in use")
+            throw BusinessException("Email: ${request.email} já está em uso")
         }
 
         val user = UserEntity(
@@ -39,13 +41,13 @@ class UserService(
 
     fun getById(id: String): UserResponse {
         val user = userRepository.findById(UUID.fromString(id))
-            .orElseThrow { NotFoundException("User not found") }
+            .orElseThrow { BusinessException("Usuário com id: ${id} não encontrado") }
         return toResponse(user)
     }
 
     fun update(id: UUID, request: UserRequest): UserResponse {
         val user = userRepository.findById(id)
-            .orElseThrow { NotFoundException("User not found") }
+            .orElseThrow { BusinessException("Usuário com id: ${id} não encontrado") }
 
         user.alias = request.alias
         user.email = request.email
@@ -58,7 +60,7 @@ class UserService(
 
     fun delete(id: UUID){
         val user = userRepository.findById(id)
-            .orElseThrow { NotFoundException("User not found") }
+            .orElseThrow { BusinessException("Usuário com id: ${id} não encontrado") }
 
         userRepository.delete(user)
     }

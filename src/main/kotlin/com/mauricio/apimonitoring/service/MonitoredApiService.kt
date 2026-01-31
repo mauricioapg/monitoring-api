@@ -3,6 +3,7 @@ package com.mauricio.apimonitoring.service
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
+import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
 import com.mauricio.apimonitoring.repository.UserRepository
@@ -19,7 +20,7 @@ class MonitoredApiService(
 
     fun create(userId: UUID, request: MonitoredApiRequest): MonitoredApiResponse {
         val user = userRepository.findById(userId)
-            .orElseThrow { NotFoundException("User not found") }
+            .orElseThrow { BusinessException("Nenhum usuário não encontrado com id: $userId") }
 
         val api = MonitoredApiEntity(
             user = user,
@@ -43,13 +44,13 @@ class MonitoredApiService(
 
     fun getById(id: String): MonitoredApiResponse {
         val api = apiRepository.findById(UUID.fromString(id))
-            .orElseThrow { NotFoundException("Monitored API not found") }
+            .orElseThrow { BusinessException("API com id: ${id} não encontrada") }
         return toResponse(api)
     }
 
     fun update(id: UUID, request: MonitoredApiRequest): MonitoredApiResponse {
         val api = apiRepository.findById(id)
-            .orElseThrow { NotFoundException("Monitored API not found") }
+            .orElseThrow { BusinessException("API com id: ${id} não encontrada") }
 
         api.name = request.name
         api.url = request.url
@@ -67,16 +68,16 @@ class MonitoredApiService(
 
     fun delete(id: UUID){
         val api = apiRepository.findById(id)
-            .orElseThrow { NotFoundException("Monitored API not found") }
+            .orElseThrow { BusinessException("API com id: ${id} não encontrada") }
 
         apiRepository.delete(api)
     }
 
     private fun toResponse(entity: MonitoredApiEntity): MonitoredApiResponse {
 
-        val userId = entity.user.id ?: throw NotFoundException("User id is null")
+        val userId = entity.user.id ?: throw NotFoundException("Id do usuário de criação está nulo")
         val user = userRepository.findById(userId)
-            .orElseThrow { NotFoundException("User not found") }
+            .orElseThrow { BusinessException("Nenhum usuário de criação encontrado com id: $userId") }
 
         return MonitoredApiResponse(
             id = entity.id!!,
