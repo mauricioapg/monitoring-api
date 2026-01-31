@@ -1,5 +1,6 @@
 package com.mauricio.apimonitoring.domain
 
+import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,11 +20,12 @@ class MonitoredApiEntity(
     @Column(nullable = false)
     var name: String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     var url: String,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var method: String,
+    var method: HttpMethodEnum,
 
     @ElementCollection
     @CollectionTable(

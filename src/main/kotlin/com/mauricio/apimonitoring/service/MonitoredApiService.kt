@@ -3,6 +3,7 @@ package com.mauricio.apimonitoring.service
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
+import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
@@ -21,6 +22,11 @@ class MonitoredApiService(
     fun create(userId: UUID, request: MonitoredApiRequest): MonitoredApiResponse {
         val user = userRepository.findById(userId)
             .orElseThrow { BusinessException("Nenhum usuário não encontrado com id: $userId") }
+
+        val apiFound = apiRepository.findByUrl(request.url)
+        if (apiFound.isPresent) {
+            throw BusinessException("API com url: ${request.url} já está em uso")
+        }
 
         val api = MonitoredApiEntity(
             user = user,
@@ -54,7 +60,7 @@ class MonitoredApiService(
 
         api.name = request.name
         api.url = request.url
-        api.method = request.method
+        api.method = HttpMethodEnum.valueOf(request.method.name)
         api.headers = request.headers
         api.expectedStatus = request.expectedStatus
         api.timeoutMs = request.timeoutMs
@@ -83,7 +89,7 @@ class MonitoredApiService(
             id = entity.id!!,
             name = entity.name,
             url = entity.url,
-            method = entity.method,
+            method = HttpMethodEnum.valueOf(entity.method.name),
             headers = entity.headers,
             active = entity.active,
             createdBy = user.alias

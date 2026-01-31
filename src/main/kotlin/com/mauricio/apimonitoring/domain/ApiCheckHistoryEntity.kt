@@ -25,6 +25,10 @@ class ApiCheckHistoryEntity(
     @Column(nullable = false)
     var success: Boolean,
 
+    var message: String? = null,
+
+    var details: String? = null,
+
     @Column(name = "checked_at", nullable = false)
     var checkedAt: LocalDateTime = LocalDateTime.now()
 )

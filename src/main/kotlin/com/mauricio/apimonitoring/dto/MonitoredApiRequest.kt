@@ -1,6 +1,7 @@
 package com.mauricio.apimonitoring.dto
 
 import com.mauricio.apimonitoring.domain.HeaderEmbeddable
+import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import jakarta.validation.constraints.*
 
 class MonitoredApiRequest(
@@ -11,8 +12,8 @@ class MonitoredApiRequest(
     @field:NotBlank
     val url: String,
 
-    @field:NotBlank
-    val method: String,
+    @field:NotNull
+    val method: HttpMethodEnum,
 
     val headers: MutableList<HeaderEmbeddable> = mutableListOf(),
 
