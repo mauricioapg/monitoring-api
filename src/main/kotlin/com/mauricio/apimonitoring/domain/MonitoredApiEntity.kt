@@ -34,6 +34,15 @@ class MonitoredApiEntity(
     )
     var headers: MutableList<HeaderEmbeddable> = mutableListOf(),
 
+    @ElementCollection
+    @CollectionTable(
+        name = "monitored_api_params",
+        joinColumns = [JoinColumn(name = "api_id")]
+    )
+    var params: MutableList<ParamsEmbeddable> = mutableListOf(),
+
+    var responsibleEmails: MutableList<String> = mutableListOf(),
+
     @Column(name = "expected_status", nullable = false)
     var expectedStatus: Int,
 

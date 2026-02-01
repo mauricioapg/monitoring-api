@@ -2,20 +2,20 @@ package com.mauricio.apimonitoring.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
 
 @Configuration
 class WebClientConfig {
 
     @Bean
-    fun webClient(): WebClient {
-        val httpClient = HttpClient.create()
-            .followRedirect(true)
+    fun webClientBuilder(): WebClient.Builder =
+        WebClient.builder()
 
-        return WebClient.builder()
-            .clientConnector(ReactorClientHttpConnector(httpClient))
+    @Bean
+    fun webClient(builder: WebClient.Builder): WebClient =
+        builder
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build()
-    }
 }

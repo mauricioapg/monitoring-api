@@ -1,6 +1,7 @@
 package com.mauricio.apimonitoring.dto
 
 import com.mauricio.apimonitoring.domain.HeaderEmbeddable
+import com.mauricio.apimonitoring.domain.ParamsEmbeddable
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import jakarta.validation.constraints.*
 
@@ -16,6 +17,10 @@ class MonitoredApiRequest(
     val method: HttpMethodEnum,
 
     val headers: MutableList<HeaderEmbeddable> = mutableListOf(),
+
+    val params: MutableList<ParamsEmbeddable> = mutableListOf(),
+
+    val responsibleEmails: MutableList<String> = mutableListOf(),
 
     @field:Min(100)
     val timeoutMs: Int,

@@ -34,6 +34,7 @@ class MonitoredApiService(
             url = request.url,
             method = request.method,
             headers = request.headers,
+            responsibleEmails = request.responsibleEmails,
             expectedStatus = request.expectedStatus,
             timeoutMs = request.timeoutMs,
             intervalMinutes = request.intervalMinutes,
@@ -91,6 +92,8 @@ class MonitoredApiService(
             url = entity.url,
             method = HttpMethodEnum.valueOf(entity.method.name),
             headers = entity.headers,
+            params = entity.params,
+            responsibleEmails = entity.responsibleEmails,
             active = entity.active,
             createdBy = user.alias
         )

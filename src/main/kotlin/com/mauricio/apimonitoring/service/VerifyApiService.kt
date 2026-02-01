@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.server.RequestPredicates.queryParam
+import org.springframework.web.util.UriComponentsBuilder
 import java.time.Duration
 
 @Service
@@ -32,12 +34,27 @@ class VerifyApiService(
         val start = System.currentTimeMillis()
 
         try {
+
+            val uri = UriComponentsBuilder
+                .fromUriString(foundApi.url)
+                .apply {
+                    if (foundApi.params.isNotEmpty()) {
+                        foundApi.params.forEach { param ->
+                            queryParam(param.key, param.value)
+                        }
+                    }
+                }
+                .build(true)
+                .toUri()
+
             val response = webClient
                 .method(HttpMethod.valueOf(foundApi.method.name))
-                .uri(foundApi.url)
+                .uri(uri)
                 .headers { httpHeaders ->
-                    foundApi.headers.forEach {
-                        httpHeaders.add(it.key, it.value)
+                    if (foundApi.headers.isNotEmpty()) {
+                        foundApi.headers.forEach {
+                            httpHeaders.add(it.key, it.value)
+                        }
                     }
                 }
                 .retrieve()
