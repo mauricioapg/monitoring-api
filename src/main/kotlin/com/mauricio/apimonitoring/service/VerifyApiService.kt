@@ -1,5 +1,7 @@
 package com.mauricio.apimonitoring.service
 
+import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
+import com.mauricio.apimonitoring.enum.StatusApiEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
 import com.mauricio.apimonitoring.repository.UserRepository
@@ -12,10 +14,13 @@ import java.time.Duration
 @Service
 class VerifyApiService(
     private val apiRepository: MonitoredApiRepository,
-    private val webClient: WebClient
+    private val webClient: WebClient,
+    private val apiCheckHistoryService: ApiCheckHistoryService
 ) {
 
     private val LOG = LoggerFactory.getLogger(UserService::class.java)
+
+    private var statusCodeError: Int? = null
 
     fun checkExternalApi(url: String?) {
 
@@ -42,6 +47,8 @@ class VerifyApiService(
             val duration = System.currentTimeMillis() - start
             val status = response?.statusCode?.value()
 
+            statusCodeError = response?.statusCode?.value()
+
             val isUp = status == foundApi.expectedStatus
 
             if (isUp) {
@@ -54,10 +61,15 @@ class VerifyApiService(
                 )
             }
 
-            // 🔜 salvar histórico:
-            // status = UP / DOWN
-            // httpStatus = status
-            // responseTime = duration
+            val savedHistory = ApiCheckHistoryRequest(
+                apiId = foundApi.id.toString(),
+                responseTimeMs = duration.toInt(),
+                status = StatusApiEnum.UP,
+                message = null,
+                details = null
+            )
+
+            apiCheckHistoryService.create(savedHistory)
 
         } catch (ex: Exception) {
             val duration = System.currentTimeMillis() - start
@@ -66,10 +78,15 @@ class VerifyApiService(
                 "Erro ao chamar API ${foundApi.url} após ${duration}ms - ${ex.message}"
             )
 
-            // 🔜 salvar histórico:
-            // status = DOWN
-            // errorMessage = ex.message
-            // responseTime = duration
+            val savedHistory = ApiCheckHistoryRequest(
+                apiId = foundApi.id.toString(),
+                responseTimeMs = duration.toInt(),
+                status = StatusApiEnum.DOWN,
+                message = ex.message,
+                details = ex.stackTrace.toString()
+            )
+
+            apiCheckHistoryService.create(savedHistory)
         }
 
 

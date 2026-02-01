@@ -1,6 +1,8 @@
 package com.mauricio.apimonitoring.domain
 
+import com.mauricio.apimonitoring.enum.StatusApiEnum
 import jakarta.persistence.*
+import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,14 +18,12 @@ class ApiCheckHistoryEntity(
     @JoinColumn(name = "api_id", nullable = false)
     var api: MonitoredApiEntity,
 
-    @Column(name = "status_code")
-    var statusCode: Int? = null,
-
     @Column(name = "response_time_ms")
     var responseTimeMs: Int? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var success: Boolean,
+    var status: StatusApiEnum,
 
     var message: String? = null,
 
