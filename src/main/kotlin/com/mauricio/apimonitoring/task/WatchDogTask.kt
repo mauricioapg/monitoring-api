@@ -24,8 +24,10 @@ class WatchDogTask @Autowired constructor(
     @Scheduled(fixedDelayString = "\${task.watchdog.monitoring.delay}")
     fun run() {
 
-        if( taskEnabled == false )
+        if( taskEnabled == false ){
+            logger.info("Verificação de APIs desabilitada")
             return
+        }
 
         val apiUrls = monitoredApiService.list().filter { it.active }
 
