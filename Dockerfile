@@ -1,16 +1,16 @@
-# ---------- BUILD ----------
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# BUILD
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 COPY pom.xml .
-RUN mvn -q -e -B -DskipTests dependency:go-offline
+RUN mvn -q -B -DskipTests dependency:go-offline
 
 COPY src ./src
 RUN mvn clean package -DskipTests
 
 
-# ---------- RUN ----------
-FROM eclipse-temurin:17-jdk
+# RUN
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
