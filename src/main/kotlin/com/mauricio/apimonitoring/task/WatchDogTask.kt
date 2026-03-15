@@ -21,7 +21,7 @@ class WatchDogTask @Autowired constructor(
     private val taskEnabled: Boolean? = null
 
     @Transactional
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "\${task.watchdog.monitoring.delay}")
     fun run() {
 
         if( taskEnabled == false )
