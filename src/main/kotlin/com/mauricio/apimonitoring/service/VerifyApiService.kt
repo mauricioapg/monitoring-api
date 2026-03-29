@@ -29,8 +29,6 @@ class VerifyApiService(
         val foundApi = apiRepository.findByUrl(url)
             .orElseThrow { BusinessException("API com url: ${url} não encontrada") }
 
-        LOG.info("Iniciando check da API: ${foundApi.url}")
-
         val start = System.currentTimeMillis()
 
         try {
@@ -68,11 +66,7 @@ class VerifyApiService(
 
             val isUp = status == foundApi.expectedStatus
 
-            if (isUp) {
-                LOG.info(
-                    "API ${foundApi.url} respondeu com status $status em ${duration}ms"
-                )
-            } else {
+            if(!isUp){
                 LOG.warn(
                     "API ${foundApi.url} respondeu $status em ${duration}ms, esperado ${foundApi.expectedStatus}"
                 )
