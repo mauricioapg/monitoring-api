@@ -76,6 +76,7 @@ class ApiCheckHistoryService(
 
         return ApiCheckHistoryResponse(
             apiId = entity.api.id!!.toString(),
+            apiName = entity.api.name,
             responseTimeMs = entity.responseTimeMs,
             status = StatusApiEnum.valueOf(entity.status.name),
             message = entity.message,

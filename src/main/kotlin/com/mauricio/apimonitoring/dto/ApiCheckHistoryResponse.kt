@@ -8,6 +8,8 @@ class ApiCheckHistoryResponse(
 
     val apiId: String,
 
+    val apiName: String,
+
     @field:Min(100)
     val responseTimeMs: Int? = null,
 
