@@ -52,6 +52,9 @@ class MonitoredApiEntity(
     @Column(name = "interval_minutes", nullable = false)
     var intervalMinutes: Int,
 
+    @Column(name = "time_to_set_offline", nullable = false)
+    var timeToSetOffline: Int? = 3,
+
     @Column(nullable = false)
     var active: Boolean = true,
 

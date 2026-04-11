@@ -1,6 +1,7 @@
 package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
+import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
@@ -8,6 +9,8 @@ import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
 import com.mauricio.apimonitoring.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -38,6 +41,7 @@ class MonitoredApiService(
             expectedStatus = request.expectedStatus,
             timeoutMs = request.timeoutMs,
             intervalMinutes = request.intervalMinutes,
+            timeToSetOffline = request.timeToSetOffline,
             createdAt = LocalDateTime.now()
         )
 
@@ -46,8 +50,15 @@ class MonitoredApiService(
         return toResponse(saved)
     }
 
-    fun list(): List<MonitoredApiResponse> =
-        apiRepository.findAll().map { toResponse(it) }
+    fun listAll(): List<MonitoredApiResponse> =
+        apiRepository
+            .findAll()
+            .map { toResponse(it) }
+
+    fun list(pageable: Pageable): Page<MonitoredApiResponse> =
+        apiRepository
+            .findAll(pageable)
+            .map { toResponse(it) }
 
     fun getById(id: String): MonitoredApiResponse {
         val api = apiRepository.findById(UUID.fromString(id))
@@ -66,6 +77,7 @@ class MonitoredApiService(
         api.expectedStatus = request.expectedStatus
         api.timeoutMs = request.timeoutMs
         api.intervalMinutes = request.intervalMinutes
+        api.timeToSetOffline = request.timeToSetOffline
         api.active = request.active
 
         val updated = apiRepository.save(api)
@@ -91,6 +103,9 @@ class MonitoredApiService(
             name = entity.name,
             url = entity.url,
             method = HttpMethodEnum.valueOf(entity.method.name),
+            intervalMinutes = entity.intervalMinutes,
+            timeout = entity.timeoutMs,
+            timeToSetOffline = entity.timeToSetOffline,
             headers = entity.headers,
             params = entity.params,
             responsibleEmails = entity.responsibleEmails,

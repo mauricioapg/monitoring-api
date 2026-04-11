@@ -1,9 +1,12 @@
 package com.mauricio.apimonitoring.controller
 
+import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.service.MonitoredApiService
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -21,8 +24,9 @@ class MonitoredApiController(
         service.create(userId, request)
 
     @GetMapping
-    fun list(): List<MonitoredApiResponse> =
-        service.list()
+    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
+        return service.list(pageable)
+    }
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): MonitoredApiResponse =

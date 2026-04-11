@@ -4,6 +4,8 @@ import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.service.ApiCheckHistoryService
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -19,8 +21,9 @@ class ApiCheckHistoryController(
     ) = service.create(request)
 
     @GetMapping
-    fun list(): List<ApiCheckHistoryResponse> =
-        service.list()
+    fun list(pageable: Pageable): Page<ApiCheckHistoryResponse> {
+        return service.list(pageable)
+    }
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): ApiCheckHistoryResponse =

@@ -28,6 +28,8 @@ class MonitoredApiRequest(
     @field:Min(1)
     val intervalMinutes: Int,
 
+    val timeToSetOffline: Int? = 3,
+
     val expectedStatus: Int = 200,
 
     val active: Boolean = true,

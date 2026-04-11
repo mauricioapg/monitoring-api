@@ -1,21 +1,22 @@
 package com.mauricio.apimonitoring.service
 
+import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
 import com.mauricio.apimonitoring.enum.StatusApiEnum
 import com.mauricio.apimonitoring.exception.BusinessException
+import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
-import com.mauricio.apimonitoring.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.server.RequestPredicates.queryParam
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.Duration
 
 @Service
 class VerifyApiService(
     private val apiRepository: MonitoredApiRepository,
+    private val apiCheckHistoryRepository: ApiCheckHistoryRepository,
     private val webClient: WebClient,
     private val apiCheckHistoryService: ApiCheckHistoryService
 ) {
@@ -66,6 +67,8 @@ class VerifyApiService(
 
             val isUp = status == foundApi.expectedStatus
 
+            monitoringStatusAPI(foundApi)
+
             if(!isUp){
                 LOG.warn(
                     "API ${foundApi.url} respondeu $status em ${duration}ms, esperado ${foundApi.expectedStatus}"
@@ -100,6 +103,33 @@ class VerifyApiService(
             apiCheckHistoryService.create(savedHistory)
         }
 
+    }
 
+    fun monitoringStatusAPI(api: MonitoredApiEntity){
+
+        val threshold = 3 // quantidade de falhas consecutivas pra considerar DOWN
+
+        val lastRecords = apiCheckHistoryRepository.findTop10ByApiIdOrderByCheckedAtDesc(api.id)
+
+        if (lastRecords.isEmpty()) {
+            LOG.warn("Sem histórico para API ${api.name}")
+            return
+        }
+
+        // pega apenas os X últimos
+        val lastFailures = lastRecords.take(threshold)
+
+        val isDownConsecutively = lastFailures.all {
+            it.status == StatusApiEnum.DOWN
+        }
+
+        if (isDownConsecutively) {
+            LOG.error("🚨 API ${api.name} caiu $threshold vezes consecutivas!")
+
+            // Aqui você pode disparar email
+            // emailService.sendEmail(...)
+        } else {
+            LOG.info("API ${api.name} está estável")
+        }
     }
 }

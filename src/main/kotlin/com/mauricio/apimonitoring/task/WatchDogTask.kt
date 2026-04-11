@@ -29,7 +29,7 @@ class WatchDogTask @Autowired constructor(
             return
         }
 
-        val apiUrls = monitoredApiService.list().filter { it.active }
+        val apiUrls = monitoredApiService.listAll().filter { it.active }
 
         if(apiUrls.isNotEmpty()){
             apiUrls.forEach { api ->

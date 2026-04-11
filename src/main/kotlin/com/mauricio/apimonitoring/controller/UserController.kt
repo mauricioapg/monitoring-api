@@ -1,9 +1,12 @@
 package com.mauricio.apimonitoring.controller
 
+import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.service.UserService
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -20,8 +23,9 @@ class UserController(
         service.create(request)
 
     @GetMapping
-    fun list(): List<UserResponse> =
-        service.list()
+    fun list(pageable: Pageable): Page<UserResponse> {
+        return service.list(pageable)
+    }
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): UserResponse =

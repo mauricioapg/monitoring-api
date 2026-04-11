@@ -1,18 +1,14 @@
 package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.ApiCheckHistoryEntity
-import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
-import com.mauricio.apimonitoring.dto.MonitoredApiRequest
-import com.mauricio.apimonitoring.dto.MonitoredApiResponse
-import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import com.mauricio.apimonitoring.enum.StatusApiEnum
 import com.mauricio.apimonitoring.exception.BusinessException
-import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
-import com.mauricio.apimonitoring.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -42,8 +38,10 @@ class ApiCheckHistoryService(
         }
     }
 
-    fun list(): List<ApiCheckHistoryResponse> =
-        apiCheckHistoryRepository.findAll().map { toResponse(it) }
+    fun list(pageable: Pageable): Page<ApiCheckHistoryResponse> =
+        apiCheckHistoryRepository
+            .findAll(pageable)
+            .map { toResponse(it) }
 
     fun getById(id: String): ApiCheckHistoryResponse {
         val api = apiCheckHistoryRepository.findById(UUID.fromString(id))

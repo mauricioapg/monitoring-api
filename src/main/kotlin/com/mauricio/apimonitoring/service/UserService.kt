@@ -1,12 +1,15 @@
 package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.UserEntity
+import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.ConflictException
 import com.mauricio.apimonitoring.exception.NotFoundException
 import com.mauricio.apimonitoring.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -36,8 +39,10 @@ class UserService(
         return toResponse(saved)
     }
 
-    fun list(): List<UserResponse> =
-        userRepository.findAll().map { toResponse(it) }
+    fun list(pageable: Pageable): Page<UserResponse> =
+        userRepository
+            .findAll(pageable)
+            .map { toResponse(it) }
 
     fun getById(id: String): UserResponse {
         val user = userRepository.findById(UUID.fromString(id))
