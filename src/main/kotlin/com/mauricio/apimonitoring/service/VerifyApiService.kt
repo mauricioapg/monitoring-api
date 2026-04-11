@@ -2,6 +2,7 @@ package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
+import com.mauricio.apimonitoring.dto.EmailRequest
 import com.mauricio.apimonitoring.enum.StatusApiEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
@@ -18,7 +19,8 @@ class VerifyApiService(
     private val apiRepository: MonitoredApiRepository,
     private val apiCheckHistoryRepository: ApiCheckHistoryRepository,
     private val webClient: WebClient,
-    private val apiCheckHistoryService: ApiCheckHistoryService
+    private val apiCheckHistoryService: ApiCheckHistoryService,
+    private val emailService: EmailService
 ) {
 
     private val LOG = LoggerFactory.getLogger(UserService::class.java)
@@ -63,34 +65,30 @@ class VerifyApiService(
             val duration = System.currentTimeMillis() - start
             val status = response?.statusCode?.value()
 
-            statusCodeError = response?.statusCode?.value()
-
             val isUp = status == foundApi.expectedStatus
-
-            monitoringStatusAPI(foundApi)
-
-            if(!isUp){
-                LOG.warn(
-                    "API ${foundApi.url} respondeu $status em ${duration}ms, esperado ${foundApi.expectedStatus}"
-                )
-            }
 
             val savedHistory = ApiCheckHistoryRequest(
                 apiId = foundApi.id.toString(),
                 responseTimeMs = duration.toInt(),
-                status = StatusApiEnum.UP,
+                status = if (isUp) StatusApiEnum.UP else StatusApiEnum.DOWN,
                 message = null,
                 details = null
             )
 
             apiCheckHistoryService.create(savedHistory)
 
+            // CHAMA SEMPRE DEPOIS DE SALVAR
+            monitoringStatusAPI(foundApi)
+
+            if (!isUp) {
+                LOG.warn("API ${foundApi.url} respondeu $status em ${duration}ms, esperado ${foundApi.expectedStatus}")
+            }
+
         } catch (ex: Exception) {
+
             val duration = System.currentTimeMillis() - start
 
-            LOG.error(
-                "Erro ao chamar API ${foundApi.url} após ${duration}ms - ${ex.message}"
-            )
+            LOG.error("Erro ao chamar API ${foundApi.url} após ${duration}ms - ${ex.message}")
 
             val savedHistory = ApiCheckHistoryRequest(
                 apiId = foundApi.id.toString(),
@@ -101,11 +99,15 @@ class VerifyApiService(
             )
 
             apiCheckHistoryService.create(savedHistory)
-        }
 
+            // TAMBÉM CHAMA NO ERRO
+            monitoringStatusAPI(foundApi)
+        }
     }
 
     fun monitoringStatusAPI(api: MonitoredApiEntity){
+
+        LOG.info("Monitorando estabilidade das APIs...")
 
         val threshold = 3 // quantidade de falhas consecutivas pra considerar DOWN
 
@@ -124,10 +126,18 @@ class VerifyApiService(
         }
 
         if (isDownConsecutively) {
-            LOG.error("🚨 API ${api.name} caiu $threshold vezes consecutivas!")
+            LOG.error("API ${api.name} caiu $threshold vezes consecutivas!")
 
             // Aqui você pode disparar email
-            // emailService.sendEmail(...)
+            api.responsibleEmails.toTypedArray().forEach {
+                emailService.sendEmail(
+                    EmailRequest(
+                        to = it,
+                        subject = "Alerta: API ${api.name} está offline",
+                        body = "A API ${api.name} caiu $threshold vezes consecutivas. Último status: $statusCodeError"
+                    )
+                )
+            }
         } else {
             LOG.info("API ${api.name} está estável")
         }

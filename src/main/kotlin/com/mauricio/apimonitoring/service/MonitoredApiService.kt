@@ -78,6 +78,7 @@ class MonitoredApiService(
         api.timeoutMs = request.timeoutMs
         api.intervalMinutes = request.intervalMinutes
         api.timeToSetOffline = request.timeToSetOffline
+        api.responsibleEmails = request.responsibleEmails
         api.active = request.active
 
         val updated = apiRepository.save(api)
