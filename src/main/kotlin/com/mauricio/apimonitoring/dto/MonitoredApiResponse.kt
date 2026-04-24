@@ -11,6 +11,7 @@ class MonitoredApiResponse(
     val url: String,
     val method: HttpMethodEnum,
     val intervalMinutes: Int,
+    val maxFailureThreshold: Int,
     val timeout: Int,
     val timeToSetOffline: Int?,
     val headers: MutableList<HeaderEmbeddable>,

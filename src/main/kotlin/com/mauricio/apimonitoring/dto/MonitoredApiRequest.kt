@@ -28,6 +28,9 @@ class MonitoredApiRequest(
     @field:Min(1)
     val intervalMinutes: Int,
 
+    @field:Min(3)
+    val maxFailureThreshold: Int,
+
     val timeToSetOffline: Int? = 3,
 
     val expectedStatus: Int = 200,

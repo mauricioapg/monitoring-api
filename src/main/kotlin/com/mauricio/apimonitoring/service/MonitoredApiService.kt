@@ -41,6 +41,7 @@ class MonitoredApiService(
             expectedStatus = request.expectedStatus,
             timeoutMs = request.timeoutMs,
             intervalMinutes = request.intervalMinutes,
+            maxFailureThreshold = request.maxFailureThreshold,
             timeToSetOffline = request.timeToSetOffline,
             createdAt = LocalDateTime.now()
         )
@@ -105,6 +106,7 @@ class MonitoredApiService(
             url = entity.url,
             method = HttpMethodEnum.valueOf(entity.method.name),
             intervalMinutes = entity.intervalMinutes,
+            maxFailureThreshold = entity.maxFailureThreshold,
             timeout = entity.timeoutMs,
             timeToSetOffline = entity.timeToSetOffline,
             headers = entity.headers,

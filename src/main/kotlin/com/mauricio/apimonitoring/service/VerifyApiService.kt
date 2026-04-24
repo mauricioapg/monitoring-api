@@ -8,6 +8,7 @@ import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -109,7 +110,7 @@ class VerifyApiService(
 
         LOG.info("Monitorando estabilidade das APIs...")
 
-        val threshold = 3 // quantidade de falhas consecutivas pra considerar DOWN
+        val threshold = api.maxFailureThreshold // quantidade de falhas consecutivas pra considerar DOWN
 
         val lastRecords = apiCheckHistoryRepository.findTop10ByApiIdOrderByCheckedAtDesc(api.id)
 
@@ -128,7 +129,7 @@ class VerifyApiService(
         if (isDownConsecutively) {
             LOG.error("API ${api.name} caiu $threshold vezes consecutivas!")
 
-            // Aqui você pode disparar email
+            // Disparar email aos responsáveis
             api.responsibleEmails.toTypedArray().forEach {
                 emailService.sendEmail(
                     EmailRequest(
@@ -138,8 +139,6 @@ class VerifyApiService(
                     )
                 )
             }
-        } else {
-            LOG.info("API ${api.name} está estável")
         }
     }
 }
