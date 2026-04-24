@@ -3,6 +3,7 @@ package com.mauricio.apimonitoring.controller
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
+import com.mauricio.apimonitoring.dto.UserResponseFull
 import com.mauricio.apimonitoring.service.UserService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -30,6 +31,10 @@ class UserController(
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): UserResponse =
         service.getById(id)
+
+    @GetMapping("/email/{email}")
+    fun getByEmail(@PathVariable email: String): UserResponseFull =
+        service.getByEmail(email)
 
     @PutMapping("/{id}")
     fun update(

@@ -1,7 +1,6 @@
 package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
-import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
