@@ -63,4 +63,5 @@ class MonitoredApiEntity(
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
+
 )

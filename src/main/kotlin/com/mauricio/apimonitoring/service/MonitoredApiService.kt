@@ -6,11 +6,14 @@ import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.NotFoundException
+import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
 import com.mauricio.apimonitoring.repository.MonitoredApiRepository
 import com.mauricio.apimonitoring.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.collections.map
@@ -18,8 +21,11 @@ import kotlin.collections.map
 @Service
 class MonitoredApiService(
     private val apiRepository: MonitoredApiRepository,
+    private val apiCheckHistoryRepository: ApiCheckHistoryRepository,
     private val userRepository: UserRepository
 ) {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     fun create(userId: UUID, request: MonitoredApiRequest): MonitoredApiResponse {
         val user = userRepository.findById(userId)
@@ -86,9 +92,13 @@ class MonitoredApiService(
         return toResponse(updated)
     }
 
-    fun delete(id: UUID){
+    @Transactional
+    fun delete(id: UUID) {
         val api = apiRepository.findById(id)
-            .orElseThrow { BusinessException("API com id: ${id} não encontrada") }
+            .orElseThrow { BusinessException("API com id: $id não encontrada") }
+
+        apiCheckHistoryRepository.deleteByApi(api)
+        apiCheckHistoryRepository.flush() // ESSENCIAL PARA DELETAR OS HISTÓRICOS ANTES DE DELETAR A API
 
         apiRepository.delete(api)
     }

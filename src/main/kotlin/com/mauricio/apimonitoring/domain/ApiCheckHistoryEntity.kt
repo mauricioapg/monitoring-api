@@ -2,6 +2,8 @@ package com.mauricio.apimonitoring.domain
 
 import com.mauricio.apimonitoring.enum.StatusApiEnum
 import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 import java.util.UUID
@@ -16,6 +18,7 @@ class ApiCheckHistoryEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "api_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     var api: MonitoredApiEntity,
 
     @Column(name = "response_time_ms")

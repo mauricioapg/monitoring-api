@@ -5,9 +5,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/health")
-class HealthController(
-    private val service: UserService,
-) {
+class HealthController() {
 
     @GetMapping
     fun health() = "OK"

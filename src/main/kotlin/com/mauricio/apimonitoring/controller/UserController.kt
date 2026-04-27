@@ -1,6 +1,5 @@
 package com.mauricio.apimonitoring.controller
 
-import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.dto.UserResponseFull
