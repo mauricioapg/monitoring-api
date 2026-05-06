@@ -6,6 +6,7 @@ import com.mauricio.apimonitoring.dto.MonitoredApiResponse
 import com.mauricio.apimonitoring.service.MonitoredApiService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
@@ -23,8 +24,19 @@ class MonitoredApiController(
     ): MonitoredApiResponse =
         service.create(userId, request)
 
+//    @GetMapping
+//    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
+//        return service.list(pageable)
+//    }
+
     @GetMapping
-    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
+    fun list(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): Page<MonitoredApiResponse> {
+
+        val pageable = PageRequest.of(page, size)
+
         return service.list(pageable)
     }
 
