@@ -23,7 +23,10 @@ class ApiKeyFilter(
         val path = request.requestURI
 
         // libera health
-        if (path == "/health") {
+        if (path == "/health" ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/v3/api-docs") ||
+            path == "/swagger-ui.html") {
             filterChain.doFilter(request, response)
             return
         }
