@@ -27,6 +27,11 @@ class UserController(
         return service.list(pageable)
     }
 
+    @GetMapping("/teste")
+    fun list(): List<UserResponse> {
+        return service.listSimple()
+    }
+
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): UserResponse =
         service.getById(id)

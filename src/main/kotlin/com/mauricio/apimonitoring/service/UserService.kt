@@ -45,6 +45,17 @@ class UserService(
             .findAll(pageable)
             .map { toResponse(it) }
 
+    fun listSimple(): List<UserResponse> {
+        return userRepository.findAll().map {
+            UserResponse(
+                id = it.id!!,
+                alias = it.alias,
+                email = it.email,
+                createdAt = it.createdAt
+            )
+        }
+    }
+
     fun getById(id: String): UserResponse {
         val user = userRepository.findById(UUID.fromString(id))
             .orElseThrow { BusinessException("Usuário com id: ${id} não encontrado") }
