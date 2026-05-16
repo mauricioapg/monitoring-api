@@ -61,10 +61,39 @@ class MonitoredApiService(
             .findAll()
             .map { toResponse(it) }
 
-    fun list(pageable: Pageable): Page<MonitoredApiResponse> =
-        apiRepository
-            .findAll(pageable)
-            .map { toResponse(it) }
+//    fun list(pageable: Pageable): Page<MonitoredApiResponse> =
+//        apiRepository
+//            .findAll(pageable)
+//            .map { toResponse(it) }
+
+    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
+
+        println("ANTES REPOSITORY")
+
+        val result = apiRepository.findAll(pageable)
+
+        println("DEPOIS REPOSITORY")
+
+        return result.map {
+            println("MAPEANDO ${it.id}")
+
+            MonitoredApiResponse(
+                id = it.id,
+                name = it.name,
+                url = it.url,
+                method = it.method,
+                intervalMinutes = it.intervalMinutes,
+                maxFailureThreshold =it.maxFailureThreshold,
+                timeout = it.timeoutMs,
+                timeToSetOffline = it.timeToSetOffline,
+                headers = it.headers,
+                params = it.params,
+                responsibleEmails = it.responsibleEmails,
+                active = it.active,
+                createdBy = it.user.alias
+            )
+        }
+    }
 
     fun getById(id: String): MonitoredApiResponse {
         val api = apiRepository.findById(UUID.fromString(id))

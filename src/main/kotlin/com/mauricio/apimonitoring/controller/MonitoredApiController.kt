@@ -30,15 +30,27 @@ class MonitoredApiController(
 //    }
 
     @GetMapping
-    fun list(
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int
-    ): Page<MonitoredApiResponse> {
+    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
 
-        val pageable = PageRequest.of(page, size)
+        println("ENTROU CONTROLLER")
 
-        return service.list(pageable)
+        val result = service.list(pageable)
+
+        println("SAIU SERVICE")
+
+        return result
     }
+
+//    @GetMapping
+//    fun list(
+//        @RequestParam(defaultValue = "0") page: Int,
+//        @RequestParam(defaultValue = "20") size: Int
+//    ): Page<MonitoredApiResponse> {
+//
+//        val pageable = PageRequest.of(page, size)
+//
+//        return service.list(pageable)
+//    }
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: String): MonitoredApiResponse =
