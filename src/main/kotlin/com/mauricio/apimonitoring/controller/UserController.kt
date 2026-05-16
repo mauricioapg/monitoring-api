@@ -1,5 +1,6 @@
 package com.mauricio.apimonitoring.controller
 
+import com.mauricio.apimonitoring.dto.PageResponseDTO
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.dto.UserResponseFull
@@ -23,7 +24,7 @@ class UserController(
         service.create(request)
 
     @GetMapping
-    fun list(pageable: Pageable): Page<UserResponse> {
+    fun list(pageable: Pageable): PageResponseDTO<UserResponse> {
         return service.list(pageable)
     }
 

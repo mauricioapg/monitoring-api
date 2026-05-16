@@ -1,6 +1,7 @@
 package com.mauricio.apimonitoring.service
 
 import com.mauricio.apimonitoring.domain.UserEntity
+import com.mauricio.apimonitoring.dto.PageResponseDTO
 import com.mauricio.apimonitoring.dto.UserRequest
 import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.dto.UserResponseFull
@@ -40,10 +41,23 @@ class UserService(
         return toResponse(saved)
     }
 
-    fun list(pageable: Pageable): Page<UserResponse> =
-        userRepository
+    fun list(pageable: Pageable): PageResponseDTO<UserResponse> {
+
+        val page = userRepository
             .findAll(pageable)
             .map { toResponse(it) }
+
+        return PageResponseDTO(
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            size = page.size,
+            number = page.number,
+            first = true,
+            last = true,
+            empty = true
+        )
+    }
 
     fun listSimple(): List<UserResponse> {
         return userRepository.findAll().map {
