@@ -1,5 +1,6 @@
 package com.mauricio.apimonitoring.domain
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -15,6 +16,12 @@ class MonitoredApiEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties(
+        value = [
+            "hibernateLazyInitializer",
+            "handler"
+        ]
+    )
     var user: UserEntity,
 
     @Column(nullable = false)
@@ -27,20 +34,26 @@ class MonitoredApiEntity(
     @Column(nullable = false)
     var method: HttpMethodEnum,
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "monitored_api_headers",
         joinColumns = [JoinColumn(name = "api_id")]
     )
     var headers: MutableList<HeaderEmbeddable> = mutableListOf(),
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "monitored_api_params",
         joinColumns = [JoinColumn(name = "api_id")]
     )
     var params: MutableList<ParamsEmbeddable> = mutableListOf(),
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "monitored_api_responsible_emails",
+        joinColumns = [JoinColumn(name = "api_id")]
+    )
+    @Column(name = "email")
     var responsibleEmails: MutableList<String> = mutableListOf(),
 
     @Column(name = "expected_status", nullable = false)
@@ -63,5 +76,4 @@ class MonitoredApiEntity(
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
-
 )
