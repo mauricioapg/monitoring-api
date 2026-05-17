@@ -2,6 +2,7 @@ package com.mauricio.apimonitoring.controller
 
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
+import com.mauricio.apimonitoring.dto.PageResponseDTO
 import com.mauricio.apimonitoring.service.ApiCheckHistoryService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -21,7 +22,7 @@ class ApiCheckHistoryController(
     ) = service.create(request)
 
     @GetMapping
-    fun list(pageable: Pageable): Page<ApiCheckHistoryResponse> {
+    fun list(pageable: Pageable): PageResponseDTO<ApiCheckHistoryResponse> {
         return service.list(pageable)
     }
 

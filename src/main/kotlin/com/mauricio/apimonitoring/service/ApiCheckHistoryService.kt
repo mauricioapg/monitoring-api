@@ -3,6 +3,8 @@ package com.mauricio.apimonitoring.service
 import com.mauricio.apimonitoring.domain.ApiCheckHistoryEntity
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryRequest
 import com.mauricio.apimonitoring.dto.ApiCheckHistoryResponse
+import com.mauricio.apimonitoring.dto.MonitoredApiResponse
+import com.mauricio.apimonitoring.dto.PageResponseDTO
 import com.mauricio.apimonitoring.enum.StatusApiEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.repository.ApiCheckHistoryRepository
@@ -38,10 +40,23 @@ class ApiCheckHistoryService(
         }
     }
 
-    fun list(pageable: Pageable): Page<ApiCheckHistoryResponse> =
-        apiCheckHistoryRepository
+    fun list(pageable: Pageable): PageResponseDTO<ApiCheckHistoryResponse> {
+
+        val page = apiCheckHistoryRepository
             .findAll(pageable)
             .map { toResponse(it) }
+
+        return PageResponseDTO(
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            size = page.size,
+            number = page.number,
+            first = true,
+            last = true,
+            empty = true
+        )
+    }
 
     fun getById(id: String): ApiCheckHistoryResponse {
         val api = apiCheckHistoryRepository.findById(UUID.fromString(id))

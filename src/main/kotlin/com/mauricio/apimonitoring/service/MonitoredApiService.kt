@@ -3,6 +3,8 @@ package com.mauricio.apimonitoring.service
 import com.mauricio.apimonitoring.domain.MonitoredApiEntity
 import com.mauricio.apimonitoring.dto.MonitoredApiRequest
 import com.mauricio.apimonitoring.dto.MonitoredApiResponse
+import com.mauricio.apimonitoring.dto.PageResponseDTO
+import com.mauricio.apimonitoring.dto.UserResponse
 import com.mauricio.apimonitoring.enum.HttpMethodEnum
 import com.mauricio.apimonitoring.exception.BusinessException
 import com.mauricio.apimonitoring.exception.NotFoundException
@@ -61,38 +63,21 @@ class MonitoredApiService(
             .findAll()
             .map { toResponse(it) }
 
-//    fun list(pageable: Pageable): Page<MonitoredApiResponse> =
-//        apiRepository
-//            .findAll(pageable)
-//            .map { toResponse(it) }
+    fun list(pageable: Pageable): PageResponseDTO<MonitoredApiResponse> {
 
-    fun list(pageable: Pageable): Page<MonitoredApiResponse> {
+        val page = apiRepository.findAll(pageable)
+        .map { toResponse(it) }
 
-        println("ANTES REPOSITORY")
-
-        val result = apiRepository.findAll(pageable)
-
-        println("DEPOIS REPOSITORY")
-
-        return result.map {
-            println("MAPEANDO ${it.id}")
-
-            MonitoredApiResponse(
-                id = it.id,
-                name = it.name,
-                url = it.url,
-                method = it.method,
-                intervalMinutes = it.intervalMinutes,
-                maxFailureThreshold =it.maxFailureThreshold,
-                timeout = it.timeoutMs,
-                timeToSetOffline = it.timeToSetOffline,
-                headers = it.headers,
-                params = it.params,
-                responsibleEmails = it.responsibleEmails,
-                active = it.active,
-                createdBy = it.user.alias
-            )
-        }
+        return PageResponseDTO(
+            content = page.content,
+            totalElements = page.totalElements,
+            totalPages = page.totalPages,
+            size = page.size,
+            number = page.number,
+            first = true,
+            last = true,
+            empty = true
+        )
     }
 
     fun getById(id: String): MonitoredApiResponse {
